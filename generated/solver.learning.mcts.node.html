@@ -1,0 +1,420 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="solver.learning.model" href="solver.learning.model.html" /><link rel="prev" title="solver.learning.mcts.mcts" href="solver.learning.mcts.mcts.html" />
+
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>solver.learning.mcts.node - Virne</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --color-brand-primary: #4E98C8;
+  --color-brand-content: #67A4BA;
+  --sd-color-success: #5EA69C;
+  --sd-color-info: #76A2DB;
+  --sd-color-warning: #AD677E;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Virne</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">Virne</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro/background.html">Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/formulation.html">Formulation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">get start</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../start/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/usage.html">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/solver_list.html">Implemented Algorithms</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">customlization</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../customlization/simulation.html">Simulation Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../customlization/sfc_deployment.html">SFC Deployment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Solver List</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../solver/exact.html">Exact Solver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solver/heuristic.html">Heuristic Solver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solver/meta_heuristic.html">Meta-heuristic Solver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solver/learning.html">Learning-based Solver</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="base.html">base</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="base.controller.html">base.controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.counter.html">base.counter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.environment.html">base.environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.recorder.html">base.recorder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.scenario.html">base.scenario</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.solution.html">base.solution</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="data.html">data</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="data.attribute.html">data.attribute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.generator.html">data.generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.network.html">data.network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.physical_network.html">data.physical_network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.virtual_network.html">data.virtual_network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.virtual_network_request_simulator.html">data.virtual_network_request_simulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current has-children"><a class="reference internal" href="solver.html">solver</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="solver.exact.html">solver.exact</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="solver.exact.d_vne.html">solver.exact.d_vne</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.exact.mip_vne.html">solver.exact.mip_vne</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.exact.r_vne.html">solver.exact.r_vne</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="solver.heuristic.html">solver.heuristic</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="solver.heuristic.bfs_trials.html">solver.heuristic.bfs_trials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.heuristic.ego_network.html">solver.heuristic.ego_network</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.heuristic.fit.html">solver.heuristic.fit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.heuristic.joint_pr.html">solver.heuristic.joint_pr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.heuristic.node_rank.html">solver.heuristic.node_rank</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current has-children"><a class="reference internal" href="solver.learning.html">solver.learning</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l4 has-children"><a class="reference internal" href="solver.learning.a3c_gcn_seq2seq.html">solver.learning.a3c_gcn_seq2seq</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.a3c_gcn_seq2seq.net.html">solver.learning.a3c_gcn_seq2seq.net</a></li>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.a3c_gcn_seq2seq.solver.html">solver.learning.a3c_gcn_seq2seq.solver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.a3c_gcn_seq2seq.sub_env.html">solver.learning.a3c_gcn_seq2seq.sub_env</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="solver.learning.buffer.html">solver.learning.buffer</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="solver.learning.gae_clustering.html">solver.learning.gae_clustering</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.gae_clustering.auto_encoder.html">solver.learning.gae_clustering.auto_encoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.gae_clustering.gae_clustering.html">solver.learning.gae_clustering.gae_clustering</a></li>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.gae_clustering.model.html">solver.learning.gae_clustering.model</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="solver.learning.graph_conv.html">solver.learning.graph_conv</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="solver.learning.hopfield_network.html">solver.learning.hopfield_network</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.hopfield_network.hopfield_network.html">solver.learning.hopfield_network.hopfield_network</a></li>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.hopfield_network.hopfield_network_solver.html">solver.learning.hopfield_network.hopfield_network_solver</a></li>
+</ul>
+</li>
+<li class="toctree-l4 current has-children"><a class="reference internal" href="solver.learning.mcts.html">solver.learning.mcts</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.mcts.mcts.html">solver.learning.mcts.mcts</a></li>
+<li class="toctree-l5 current current-page"><a class="current reference internal" href="#">solver.learning.mcts.node</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="solver.learning.model.html">solver.learning.model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.learning.net.html">solver.learning.net</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.learning.obs_handler.html">solver.learning.obs_handler</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="solver.learning.pg_cnn.html">solver.learning.pg_cnn</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.pg_cnn.net.html">solver.learning.pg_cnn.net</a></li>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.pg_cnn.pg_cnn_solver.html">solver.learning.pg_cnn.pg_cnn_solver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.pg_cnn.sub_env.html">solver.learning.pg_cnn.sub_env</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="solver.learning.pg_cnn2.html">solver.learning.pg_cnn2</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.pg_cnn2.net.html">solver.learning.pg_cnn2.net</a></li>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.pg_cnn2.solver.html">solver.learning.pg_cnn2.solver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.pg_cnn2.sub_env.html">solver.learning.pg_cnn2.sub_env</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="solver.learning.pg_mlp.html">solver.learning.pg_mlp</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.pg_mlp.net.html">solver.learning.pg_mlp.net</a></li>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.pg_mlp.pg_mlp_solver.html">solver.learning.pg_mlp.pg_mlp_solver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.pg_mlp.sub_env.html">solver.learning.pg_mlp.sub_env</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="solver.learning.pg_seq2seq.html">solver.learning.pg_seq2seq</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" role="switch" type="checkbox"/><label for="toctree-checkbox-15"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.pg_seq2seq.net.html">solver.learning.pg_seq2seq.net</a></li>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.pg_seq2seq.solver.html">solver.learning.pg_seq2seq.solver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="solver.learning.pg_seq2seq.sub_env.html">solver.learning.pg_seq2seq.sub_env</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="solver.learning.rl_environment.html">solver.learning.rl_environment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.learning.rl_solver.html">solver.learning.rl_solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.learning.safe_rl_solver.html">solver.learning.safe_rl_solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.learning.searcher.html">solver.learning.searcher</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.learning.sub_rl_environment.html">solver.learning.sub_rl_environment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.learning.utils.html">solver.learning.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="solver.meta_heuristic.html">solver.meta_heuristic</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="solver.meta_heuristic.ant_colony_optimization_solver.html">solver.meta_heuristic.ant_colony_optimization_solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.meta_heuristic.genetic_algorithm_solver.html">solver.meta_heuristic.genetic_algorithm_solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.meta_heuristic.meta_heuristic_solver.html">solver.meta_heuristic.meta_heuristic_solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.meta_heuristic.particle_swarm_optimization_solver.html">solver.meta_heuristic.particle_swarm_optimization_solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.meta_heuristic.simulated_annealing_solver.html">solver.meta_heuristic.simulated_annealing_solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.meta_heuristic.utils.html">solver.meta_heuristic.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="solver.rank.html">solver.rank</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" role="switch" type="checkbox"/><label for="toctree-checkbox-17"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="solver.rank.link_rank.html">solver.rank.link_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.rank.node_rank.html">solver.rank.node_rank</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="solver.registry.html">solver.registry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solver.solver.html">solver.solver</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="module-solver.learning.mcts.node">
+<span id="solver-learning-mcts-node"></span><h1>solver.learning.mcts.node<a class="headerlink" href="#module-solver.learning.mcts.node" title="Permalink to this heading">#</a></h1>
+<p class="rubric">Classes</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Node</span></code>([parent, state])</p></td>
+<td><p>Node of Monte Carlo Tree</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">State</span></code>(p_net, v_net, controller, recorder, ...)</p></td>
+<td><p>The state of MCTS to record the state in one node.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="solver.learning.model.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">solver.learning.model</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="solver.learning.mcts.mcts.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">solver.learning.mcts.mcts</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, GeminiLight
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/furo.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    </body>
+</html>
